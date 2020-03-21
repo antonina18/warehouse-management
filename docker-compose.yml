@@ -1,0 +1,12 @@
+version: "3.5"
+services:
+  mongo:
+    image: mongo:4.2.3
+    container_name: wh_mongo
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    volumes:
+      - ./data/db:/data/db
+    ports:
+      - 27017:27017
