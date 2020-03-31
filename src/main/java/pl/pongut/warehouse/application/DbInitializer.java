@@ -2,6 +2,7 @@ package pl.pongut.warehouse.application;
 
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
+import pl.pongut.warehouse.data.product.Product;
 import pl.pongut.warehouse.data.supplier.Supplier;
 import pl.pongut.warehouse.domain.repository.ProductRepository;
 import pl.pongut.warehouse.domain.repository.SupplierRepository;
@@ -29,6 +30,15 @@ public class DbInitializer {
                 createSupplier("333333333333333333333333", "www.gawarin.pl", "+41512022033", "UA", "36-458", "ukraine", "Odessa", "Panimaje")
         );
         supplierRepository.saveAll(toSave).subscribe();
+
+        productRepository.saveAll(
+                List.of(
+                        Product.builder()._id(new ObjectId("111111111111111111111111")).productName("milk").categoryName("cat1").build(),
+                        Product.builder()._id(new ObjectId("222222222222222222222222")).productName("milkyway").categoryName("cat1").build(),
+                        Product.builder()._id(new ObjectId("333333333333333333333333")).productName("prefixmilkyway").categoryName("cat2").build(),
+                        Product.builder()._id(new ObjectId("444444444444444444444444")).productName("SomeOtherProd").categoryName("cat1").build()
+                )
+        ).subscribe();
     }
 
     private Supplier createSupplier(String hexId, String homePage, String phone, String country, String postalCode, String region, String city, String companyName) {
