@@ -13,6 +13,8 @@ import pl.pongut.warehouse.domain.repository.ProductRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.web.reactive.function.server.ServerResponse.notFound;
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
@@ -37,8 +39,10 @@ public class ProductHandler {
     }
 
     public Mono<ServerResponse> handleGetAll(ServerRequest request) {
-        Flux<ProductDto> products = productService.findAll(prepareProductSearchParams(request));
+//        Flux<ProductDto> products = productService.findAll(prepareProductSearchParams(request));
+        Flux<Product> products = productRepository.findAllByProductNameLikeOrUnitPriceIsLessThan(request.queryParam("productName").get(), new BigDecimal(request.queryParam("unitPrice").get()));
         return ok().contentType(APPLICATION_JSON).body(products, Product.class);
+//        return null;
     }
 
     //TODO: some mapper here needed

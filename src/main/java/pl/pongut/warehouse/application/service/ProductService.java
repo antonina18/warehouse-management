@@ -34,21 +34,21 @@ public class ProductService {
                 .map(QProduct.product.productName::contains)
                 .orElse(QProduct.product.productName.isNotEmpty());
 
-        BooleanExpression categoryNamePredicate = dto.getCategoryName()
-                .map(QProduct.product.categoryName::eq)
-                .orElse(QProduct.product.categoryName.isNotEmpty());
+//        BooleanExpression categoryNamePredicate = dto.getCategoryName()
+//                .map(QProduct.product.categoryName::eq)
+//                .orElse(QProduct.product.categoryName.isNotEmpty());
+//
+//        BooleanExpression priceGreaterOrEqual = dto.getPriceFrom()
+//                .map(QProduct.product.unitPrice::goe)
+//                .orElse(QProduct.product.unitPrice.isNotNull());
+//
+//        BooleanExpression priceLowerOrEqual = dto.getPriceTo()
+//                .map(QProduct.product.unitPrice::loe)
+//                .orElse(QProduct.product.unitPrice.isNotNull());
 
-        BooleanExpression priceGreaterOrEqual = dto.getPriceFrom()
-                .map(QProduct.product.unitPrice::goe)
-                .orElse(QProduct.product.unitPrice.isNotNull());
-
-        BooleanExpression priceLowerOrEqual = dto.getPriceTo()
-                .map(QProduct.product.unitPrice::loe)
-                .orElse(QProduct.product.unitPrice.isNotNull());
-
-        return productNamePredicate
-                .and(categoryNamePredicate)
-                .and(priceGreaterOrEqual)
-                .and(priceLowerOrEqual);
+        return productNamePredicate;
+//                .and(categoryNamePredicate)
+//                .and(priceGreaterOrEqual)
+//                .and(priceLowerOrEqual);
     }
 }
