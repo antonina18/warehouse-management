@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 @Document(collection = "products")
 @TypeAlias("product")
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor
 @EqualsAndHashCode
 public class Product {
