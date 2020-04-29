@@ -1,7 +1,5 @@
 package pl.pongut.warehouse.data.product;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -12,12 +10,11 @@ import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 import pl.pongut.warehouse.data.supplier.Supplier;
 
-import java.math.BigDecimal;
 
 @Document(collection = "products")
 @TypeAlias("product")
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor
 @EqualsAndHashCode
 public class Product {
@@ -26,7 +23,7 @@ public class Product {
     private ObjectId _id;
     private String productName;
     private Integer quantityPerUnit;
-    private BigDecimal unitPrice;
+    private Double unitPrice;
     private Integer unitsInStock;
     private Boolean discount;
     private String categoryName;
