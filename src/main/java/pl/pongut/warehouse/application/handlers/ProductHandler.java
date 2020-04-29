@@ -4,16 +4,14 @@ package pl.pongut.warehouse.application.handlers;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import pl.pongut.warehouse.application.service.dto.GetAllProductsDto;
 import pl.pongut.warehouse.application.service.ProductService;
+import pl.pongut.warehouse.application.service.dto.GetAllProductsDto;
 import pl.pongut.warehouse.data.product.Product;
 import pl.pongut.warehouse.data.product.ProductMapper;
 import pl.pongut.warehouse.domain.model.product.ProductDto;
 import pl.pongut.warehouse.domain.repository.ProductRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.math.BigDecimal;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.web.reactive.function.server.ServerResponse.notFound;
@@ -34,24 +32,22 @@ public class ProductHandler {
 
     public Mono<ServerResponse> handleGet(ServerRequest request) {
         Mono<ProductDto> productDto = productRepository.findById(request.pathVariable("id"))
-                .map(productMapper::mapToProductDto);
+            .map(productMapper::mapToProductDto);
         return ok().body(productDto, Product.class).switchIfEmpty(notFound().build());
     }
 
     public Mono<ServerResponse> handleGetAll(ServerRequest request) {
-//        Flux<ProductDto> products = productService.findAll(prepareProductSearchParams(request));
-        Flux<Product> products = productRepository.findAllByProductNameLikeOrUnitPriceIsLessThan(request.queryParam("productName").get(), new BigDecimal(request.queryParam("unitPrice").get()));
+        final GetAllProductsDto getAllProductsDto = prepareGetAllProductsDto(request);
+        final Flux<ProductDto> products = productService.findAll(getAllProductsDto);
         return ok().contentType(APPLICATION_JSON).body(products, Product.class);
-//        return null;
     }
 
-    //TODO: some mapper here needed
-    private GetAllProductsDto prepareProductSearchParams(ServerRequest request) {
-        return GetAllProductsDto.builder()
-                .productName(request.queryParam("productName"))
-                .productName(request.queryParam("categoryName"))
-                .productName(request.queryParam("priceGreaterThan"))
-                .productName(request.queryParam("priceLowerThan"))
-                .build();
+    private GetAllProductsDto prepareGetAllProductsDto(ServerRequest request) {
+        GetAllProductsDto.GetAllProductsDtoBuilder builder = GetAllProductsDto.builder();
+        request.queryParam("productName").ifPresent(builder::productName);
+        request.queryParam("categoryName").ifPresent(builder::categoryName);
+        request.queryParam("priceGreaterThan").ifPresent(v -> builder.priceFrom(Double.valueOf(v)));
+        request.queryParam("priceLowerThan").ifPresent(v -> builder.priceTo(Double.valueOf(v)));
+        return builder.build();
     }
 }

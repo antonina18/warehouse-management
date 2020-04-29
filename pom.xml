@@ -26,6 +26,7 @@
     </properties>
 
     <dependencies>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -121,7 +122,8 @@
                         </goals>
                         <configuration>
                             <outputDirectory>target/generated-sources/queries</outputDirectory>
-                            <processor>org.springframework.data.mongodb.repository.support.MongoAnnotationProcessor</processor>
+                            <processor>org.springframework.data.mongodb.repository.support.MongoAnnotationProcessor
+                            </processor>
                         </configuration>
                     </execution>
                 </executions>

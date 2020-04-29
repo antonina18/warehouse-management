@@ -1,9 +1,11 @@
 package pl.pongut.warehouse.data.product;
 
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 import pl.pongut.warehouse.domain.model.product.ProductDto;
 
 @Component
+@NoArgsConstructor
 public class ProductMapper {
 
     public Product mapToProduct(ProductDto productDto) {

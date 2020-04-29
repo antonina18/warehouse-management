@@ -8,7 +8,6 @@ import pl.pongut.warehouse.domain.repository.ProductRepository;
 import pl.pongut.warehouse.domain.repository.SupplierRepository;
 
 import javax.annotation.PostConstruct;
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,10 +33,10 @@ public class DbInitializer {
 
         productRepository.saveAll(
                 List.of(
-                        Product.builder()._id(new ObjectId("111111111111111111111111")).productName("milk").categoryName("cat1").unitPrice(BigDecimal.TEN).build(),
-                        Product.builder()._id(new ObjectId("222222222222222222222222")).productName("milkyway").categoryName("cat1").build(),
-                        Product.builder()._id(new ObjectId("333333333333333333333333")).productName("prefixmilkyway").categoryName("cat2").build(),
-                        Product.builder()._id(new ObjectId("444444444444444444444444")).productName("SomeOtherProd").categoryName("cat1").build()
+                        Product.builder()._id(new ObjectId("111111111111111111111111")).productName("milk").categoryName("cat1").unitPrice(1d).build(),
+                        Product.builder()._id(new ObjectId("222222222222222222222222")).productName("milkyway").unitPrice(3d).categoryName("cat1").build(),
+                        Product.builder()._id(new ObjectId("333333333333333333333333")).productName("prefixmilkyway").unitPrice(5d).categoryName("cat2").build(),
+                        Product.builder()._id(new ObjectId("444444444444444444444444")).productName("SomeOtherProd").unitPrice(10d).categoryName("cat1").build()
                 )
         ).subscribe();
     }

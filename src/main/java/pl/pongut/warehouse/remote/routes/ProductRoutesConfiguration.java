@@ -25,15 +25,15 @@ public class ProductRoutesConfiguration {
     @Bean
     public RouterFunction<ServerResponse> productRouterFunction(ProductHandler handler) {
         return nest(path("/products"),
-                route(
-                        GET("")
-                                .and(accept(APPLICATION_JSON)),
-                        handler::handleGetAll)
+            route(
+                GET("")
+                    .and(accept(APPLICATION_JSON)),
+                handler::handleGetAll)
                 .andRoute(
-                        GET("/{id}")
-                                .and(accept(APPLICATION_JSON)),
-                        handler::handleGet)
-               );
+                    GET("/{id}")
+                        .and(accept(APPLICATION_JSON)),
+                    handler::handleGet)
+        );
     }
 
 }

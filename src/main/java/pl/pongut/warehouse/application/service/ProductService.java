@@ -1,5 +1,6 @@
 package pl.pongut.warehouse.application.service;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.stereotype.Service;
 import pl.pongut.warehouse.application.service.dto.GetAllProductsDto;
@@ -8,6 +9,8 @@ import pl.pongut.warehouse.data.product.QProduct;
 import pl.pongut.warehouse.domain.model.product.ProductDto;
 import pl.pongut.warehouse.domain.repository.ProductRepository;
 import reactor.core.publisher.Flux;
+
+import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 
@@ -22,33 +25,30 @@ public class ProductService {
     }
 
     public Flux<ProductDto> findAll(GetAllProductsDto getAllProductsDto) {
-        return productRepository.findAll(buildSearchPredicate(getAllProductsDto))
-                .map(productMapper::mapToProductDto)
-                .collect(toList())
-                .flatMapMany(Flux::fromIterable);
+        return productRepository
+            .findAll(buildSearchPredicate(getAllProductsDto))
+            .map(productMapper::mapToProductDto)
+            .collect(toList())
+            .flatMapMany(Flux::fromIterable);
     }
 
-    private BooleanExpression buildSearchPredicate(GetAllProductsDto dto) {
-        //TODO: some refactor here
-        BooleanExpression productNamePredicate = dto.getProductName()
-                .map(QProduct.product.productName::contains)
-                .orElse(QProduct.product.productName.isNotEmpty());
+    private BooleanBuilder buildSearchPredicate(GetAllProductsDto dto) {
+        BooleanExpression productNamePredicate = Optional.ofNullable(dto.getProductName())
+            .map(QProduct.product.productName::contains).orElse(null);
 
-//        BooleanExpression categoryNamePredicate = dto.getCategoryName()
-//                .map(QProduct.product.categoryName::eq)
-//                .orElse(QProduct.product.categoryName.isNotEmpty());
-//
-//        BooleanExpression priceGreaterOrEqual = dto.getPriceFrom()
-//                .map(QProduct.product.unitPrice::goe)
-//                .orElse(QProduct.product.unitPrice.isNotNull());
-//
-//        BooleanExpression priceLowerOrEqual = dto.getPriceTo()
-//                .map(QProduct.product.unitPrice::loe)
-//                .orElse(QProduct.product.unitPrice.isNotNull());
+        BooleanExpression categoryNamePredicate = Optional.ofNullable(dto.getCategoryName())
+            .map(QProduct.product.categoryName::eq).orElse(null);
 
-        return productNamePredicate;
-//                .and(categoryNamePredicate)
-//                .and(priceGreaterOrEqual)
-//                .and(priceLowerOrEqual);
+        BooleanExpression priceGreaterOrEqual = Optional.ofNullable(dto.getPriceFrom())
+            .map(QProduct.product.unitPrice::goe).orElse(null);
+
+        BooleanExpression priceLowerOrEqual = Optional.ofNullable(dto.getPriceTo())
+            .map(QProduct.product.unitPrice::loe).orElse(null);
+
+        return new BooleanBuilder()
+            .and(productNamePredicate)
+            .and(categoryNamePredicate)
+            .and(priceGreaterOrEqual)
+            .and(priceLowerOrEqual);
     }
 }
