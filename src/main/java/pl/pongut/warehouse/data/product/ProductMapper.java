@@ -8,7 +8,7 @@ import pl.pongut.warehouse.domain.model.product.ProductDto;
 @NoArgsConstructor
 public class ProductMapper {
 
-    public Product mapToProduct(ProductDto productDto) {
+    public Product toProduct(ProductDto productDto) {
         return Product.builder()
                 ._id(productDto.get_id())
                 .productName(productDto.getProductName())
@@ -20,7 +20,7 @@ public class ProductMapper {
                 .build();
     }
 
-    public ProductDto mapToProductDto(Product product) {
+    public ProductDto toProductDto(Product product) {
         return ProductDto.builder()
                 ._id(product.get_id())
                 .productName(product.getProductName())

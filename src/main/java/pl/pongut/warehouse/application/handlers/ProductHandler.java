@@ -1,6 +1,7 @@
 package pl.pongut.warehouse.application.handlers;
 
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -9,6 +10,7 @@ import pl.pongut.warehouse.application.service.dto.GetAllProductsDto;
 import pl.pongut.warehouse.data.product.Product;
 import pl.pongut.warehouse.data.product.ProductMapper;
 import pl.pongut.warehouse.domain.model.product.ProductDto;
+import pl.pongut.warehouse.domain.repository.Page;
 import pl.pongut.warehouse.domain.repository.ProductRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -20,6 +22,7 @@ import static org.springframework.web.reactive.function.server.ServerResponse.ok
 @Component
 public class ProductHandler {
 
+    public static final String DEFAULT_PAGE_SIZE = "10";
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
     private final ProductService productService;
@@ -32,7 +35,7 @@ public class ProductHandler {
 
     public Mono<ServerResponse> handleGet(ServerRequest request) {
         Mono<ProductDto> productDto = productRepository.findById(request.pathVariable("id"))
-            .map(productMapper::mapToProductDto);
+            .map(productMapper::toProductDto);
         return ok().body(productDto, Product.class).switchIfEmpty(notFound().build());
     }
 
@@ -40,6 +43,17 @@ public class ProductHandler {
         final GetAllProductsDto getAllProductsDto = prepareGetAllProductsDto(request);
         final Flux<ProductDto> products = productService.findAll(getAllProductsDto);
         return ok().contentType(APPLICATION_JSON).body(products, Product.class);
+    }
+
+    public Mono<ServerResponse> handleGetAllPaged(ServerRequest request) {
+        final PageRequest pageable = PageRequest.of(
+            Integer.parseInt(request.queryParam("page").orElse("0")),
+            Integer.parseInt(request.queryParam("size").orElse(DEFAULT_PAGE_SIZE))
+        );
+
+        final GetAllProductsDto getAllProductsDto = prepareGetAllProductsDto(request);
+        final Mono<Page<ProductDto>> allPaged = productService.findAllPaged(getAllProductsDto, pageable);
+        return ok().contentType(APPLICATION_JSON).body(allPaged, Product.class);
     }
 
     private GetAllProductsDto prepareGetAllProductsDto(ServerRequest request) {
@@ -51,3 +65,5 @@ public class ProductHandler {
         return builder.build();
     }
 }
+
+
