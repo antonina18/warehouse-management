@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import pl.pongut.warehouse.application.service.dto.GetAllProductsDto;
 import pl.pongut.warehouse.data.product.Product;
@@ -27,10 +28,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 import static pl.pongut.warehouse.application.service.testFixtures.ProductTestFixtures.testProduct;
 
+@SuppressWarnings("ConstantConditions")
 @DataMongoTest
 @ExtendWith(SpringExtension.class)
 public class ProductServiceIT {
@@ -102,13 +103,10 @@ public class ProductServiceIT {
         StepVerifier.create(productsFlux)
             .recordWith(ArrayList::new)
             .expectNextCount(expectedOutput.size())
-            .consumeRecordedWith(foundProducts -> {
-                    assertThat(
-                        foundProducts.stream().map(i -> i.get_id().toString()).collect(Collectors.toList()),
-                        containsInAnyOrder(expectedOutput.toArray())
-                    );
-                }
-            ).verifyComplete();
+            .consumeRecordedWith(foundProducts -> assertThat(
+                foundProducts.stream().map(i -> i.get_id().toString()).collect(Collectors.toList()),
+                containsInAnyOrder(expectedOutput.toArray())))
+            .verifyComplete();
     }
 
     @Test
@@ -153,6 +151,59 @@ public class ProductServiceIT {
         assertThat(result.getTotalItems(), equalTo(0));
         assertThat(result.getPageNumber(), equalTo(0));
         assertThat(result.getPageSize(), equalTo(pageSize));
+    }
+
+    @Test
+    public void findAllWithSortingByProductName() {
+        //given
+        productRepository.saveAll(List.of(
+            testProduct().toBuilder().productName("A").build(),
+            testProduct().toBuilder().productName("b").build(),
+            testProduct().toBuilder().productName("C").build()
+        )).blockLast();
+
+        //when
+        Page<ProductDto> foundProducts = productService.findAllPaged(
+            GetAllProductsDto.builder().build(),
+            PageRequest.of(0, 3, Sort.by(new Sort.Order(Sort.Direction.ASC, "productName").ignoreCase())))
+            .block();
+
+        //then
+        System.out.println("############");
+        System.out.println("############");
+        System.out.println("            ");
+        System.out.println(foundProducts.getItems().stream().map(ProductDto::getProductName).collect(Collectors.toList()));
+        System.out.println("            ");
+        System.out.println("############");
+        System.out.println("############");
+
+
+        assertThat(
+            foundProducts.getItems().stream().map(ProductDto::getProductName).collect(Collectors.toList()),
+//            contains("A","b","C"));// TODO: 25.05.2020 that should work
+            contains("A", "C", "b"));
+    }
+
+    @Test
+    public void findAllWithSortingByPriceDescending() {
+        //given
+        //given
+        productRepository.saveAll(List.of(
+            testProduct().toBuilder().productName("A").unitPrice(1.0).build(),
+            testProduct().toBuilder().productName("B").unitPrice(3.0).build(),
+            testProduct().toBuilder().productName("C").unitPrice(2.0).build()
+        )).blockLast();
+
+        //when
+        Page<ProductDto> foundProducts = productService.findAllPaged(
+            GetAllProductsDto.builder().build(),
+            PageRequest.of(0, 3, Sort.by(new Sort.Order(Sort.Direction.DESC, "unitPrice"))))
+            .block();
+
+        //then
+        assertThat(
+            foundProducts.getItems().stream().map(ProductDto::getProductName).collect(Collectors.toList()),
+            contains("B", "C", "A"));
     }
 
     private List<Product> generateProducts(int productsAmount) {

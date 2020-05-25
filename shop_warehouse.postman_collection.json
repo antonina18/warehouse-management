@@ -32,7 +32,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{api}}/products?priceGreaterThan=3",
+							"raw": "{{api}}/products?priceGreaterThan=3&sort_by=unitPrice&order_by=desc",
 							"host": [
 								"{{api}}"
 							],
@@ -43,6 +43,14 @@
 								{
 									"key": "priceGreaterThan",
 									"value": "3"
+								},
+								{
+									"key": "sort_by",
+									"value": "unitPrice"
+								},
+								{
+									"key": "order_by",
+									"value": "desc"
 								}
 							]
 						}
@@ -55,7 +63,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{api}}/products/paged?priceGreaterThan=2&page=0&size=5",
+							"raw": "{{api}}/products/paged?priceGreaterThan=2&page=0&size=5&sort_by=unitPrice&order_by=desc",
 							"host": [
 								"{{api}}"
 							],
@@ -75,6 +83,14 @@
 								{
 									"key": "size",
 									"value": "5"
+								},
+								{
+									"key": "sort_by",
+									"value": "unitPrice"
+								},
+								{
+									"key": "order_by",
+									"value": "desc"
 								}
 							]
 						}

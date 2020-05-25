@@ -2,7 +2,6 @@ package pl.pongut.warehouse.application.service;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import pl.pongut.warehouse.application.service.dto.GetAllProductsDto;
@@ -20,8 +19,6 @@ import static java.util.stream.Collectors.toList;
 
 @Service
 public class ProductService {
-    private static final int DEFAULT_PAGE_SIZE = 10;
-
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
 
