@@ -1,7 +1,7 @@
 package pl.pongut.warehouse.application.handlers;
 
-
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -46,9 +46,18 @@ public class ProductHandler {
     }
 
     public Mono<ServerResponse> handleGetAllPaged(ServerRequest request) {
+        final Sort sorting = request.queryParam("sort_by")
+            .map(sortBy -> request.queryParam("order_by")
+                .filter(orderBy -> !orderBy.equals("desc"))
+                .map(orderBy -> new Sort.Order(Sort.Direction.ASC, sortBy).ignoreCase())
+                .orElse(new Sort.Order(Sort.Direction.DESC, sortBy).ignoreCase()))
+            .map(Sort::by)
+            .orElse(Sort.unsorted());
+
         final PageRequest pageable = PageRequest.of(
             Integer.parseInt(request.queryParam("page").orElse("0")),
-            Integer.parseInt(request.queryParam("size").orElse(DEFAULT_PAGE_SIZE))
+            Integer.parseInt(request.queryParam("size").orElse(DEFAULT_PAGE_SIZE)),
+            sorting
         );
 
         final GetAllProductsDto getAllProductsDto = prepareGetAllProductsDto(request);
